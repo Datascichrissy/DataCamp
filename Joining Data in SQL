@@ -1,0 +1,38 @@
+-- Select all columns from cities
+SELECT * FROM 
+cities;
+
+--Join cities with countries table
+SELECT * 
+FROM cities
+-- Inner join to countries
+INNER JOIN countries
+-- Match on country codes
+ON cities.country_code = countries.code
+
+-- Select name fields (with alias) and region 
+SELECT city.name, country.name, country.region
+FROM cities AS city
+INNER JOIN countries AS country
+ON city.country_code = country.code;
+
+-- Select name fields (with alias) and region 
+SELECT cities.name as city , countries.name as country, countries.region
+FROM cities
+INNER JOIN countries
+ON cities.country_code = countries.code;
+
+-- Select fields with aliases
+SELECT c.code as country_code, c.name, e.year, e.inflation_rate
+FROM countries AS c
+-- Join to economies (alias e)
+INNER JOIN economies as e
+-- Match on code field using table aliases
+ON c.code = e.code
+
+--Use the country code field to complete the INNER JOIN with USING; do not change any alias names.
+SELECT c.name AS country, l.name AS language, official
+FROM countries AS c
+INNER JOIN languages AS l
+-- Match using the code column
+USING (code); 
