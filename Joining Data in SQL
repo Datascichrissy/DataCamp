@@ -245,4 +245,84 @@ From countries
 ORDER BY name;
 
 Chapter 4
+Create a semi join out of the two queries you've written, which filters unique languages returned in the first query for only those languages spoken in the 'Middle East'.
+SELECT DISTINCT name
+FROM languages
+-- Add syntax to use bracketed subquery below as a filter
+WHERE code in
+    (SELECT code
+    FROM countries
+    WHERE region = 'Middle East')
+ORDER BY name;
 
+SELECT code, name
+FROM countries
+WHERE continent = 'Oceania'
+-- Filter for countries not included in the bracketed subquery
+AND code NOT IN
+    (SELECT code
+    FROM currencies);
+
+SELECT *
+FROM populations
+-- Filter for only those populations where life expectancy is 1.15 times higher than average
+WHERE life_expectancy > 1.15 * 
+  (SELECT AVG(life_expectancy) AS avg_life_expectancy
+   FROM populations
+   WHERE year = 2015) 
+    AND year = 2015;
+
+-- Find top nine countries with the most cities
+SELECT countries.name AS country,
+       COUNT(cities.country_code) AS cities_num
+FROM countries
+LEFT JOIN cities ON countries.code = cities.country_code
+GROUP BY countries.name
+ORDER BY cities_num DESC, country ASC
+LIMIT 9;
+
+SELECT countries.name AS country,
+-- Subquery that provides the count of cities   
+  (SELECT count(*)
+   FROM cities
+   WHERE countries.code = cities.country_code) AS cities_num
+FROM countries
+ORDER BY cities_num DESC, country
+LIMIT 9;
+
+-- Select local_name and lang_num from appropriate tables
+SELECT local_name, lang_num
+FROM countries,
+  (SELECT code, COUNT(*) AS lang_num
+  FROM languages
+  GROUP BY code) AS sub
+-- Where codes match
+WHERE countries.code = sub.code
+ORDER BY lang_num DESC;
+
+SELECT code, inflation_rate, unemployment_rate
+FROM economies
+WHERE year = 2015 AND code NOT IN
+  (SELECT code
+   FROM countries
+   WHERE (gov_form  LIKE '%Monarchy%' OR gov_form  LIKE '%Republic%'))
+ORDER BY inflation_rate;
+
+-- Select fields
+SELECT name, country_code, city_proper_pop, metroarea_pop,  
+      -- Calculate city_perc
+      city_proper_pop / metroarea_pop * 100 AS city_perc
+  -- From appropriate table
+  FROM cities
+  -- Where 
+  WHERE name IN
+    -- Subquery
+    (SELECT capital
+     FROM countries
+     WHERE (continent = 'Europe'
+        OR continent LIKE '%America'))
+       AND metroarea_pop IS NOT NULL
+-- Order appropriately
+ORDER BY city_perc DESC
+-- Limit amount
+LIMIT 10;
