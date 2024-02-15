@@ -36,3 +36,167 @@ FROM countries AS c
 INNER JOIN languages AS l
 -- Match using the code column
 USING (code); 
+
+Chapter 2
+-Perform an inner join with cities AS c1 on the left and countries as c2 on the right.
+SELECT 
+    c1.name AS city,
+    code,
+    c2.name AS country,
+    region,
+    city_proper_pop
+FROM cities AS c1
+-- Perform an inner join with cities as c1 and countries as c2 on country code
+INNER JOIN countries AS c2
+ON c1.country_code = c2.code
+ORDER BY code DESC;
+
+Change the code to perform a LEFT JOIN instead of an INNER JOIN.
+SELECT 
+	c1.name AS city, 
+    code, 
+    c2.name AS country,
+    region, 
+    city_proper_pop
+FROM cities AS c1
+-- Join right table (with alias)
+LEFT JOIN countries as c2
+ON c1.country_code = c2.code
+ORDER BY code DESC;
+
+Complete the LEFT JOIN with the countries table on the left and the economies table on the right on the code field.
+SELECT name, region, gdp_percapita
+FROM countries AS c
+LEFT JOIN economies AS e
+-- Match on code fields
+ON c.code = e.code
+-- Filter for the year 2010
+WHERE year = 2010 ;
+
+-- Select region, and average gdp_percapita as avg_gdp
+SELECT region, AVG(gdp_percapita) AS avg_gdp
+FROM countries AS c
+LEFT JOIN economies AS e
+USING(code)
+WHERE year = 2010
+-- Group by region
+GROUP BY region;
+
+Order the result set by the average GDP per capita from highest to lowest.
+SELECT region, AVG(gdp_percapita) AS avg_gdp
+FROM countries AS c
+LEFT JOIN economies AS e
+USING(code)
+WHERE year = 2010
+GROUP BY region
+-- Order by descending avg_gdp
+ORDER BY avg_gdp desc
+-- Return only first 10 records
+LIMIT 10;
+
+-- Modify this query to use RIGHT JOIN instead of LEFT JOIN
+SELECT countries.name AS country, languages.name AS language, percent
+FROM languages
+RIGHT JOIN countries
+USING(code)
+ORDER BY language;
+
+Perform a full join with countries (left) and currencies (right).
+Filter for the North America region or NULL country names.
+SELECT name AS country, code, region, basic_unit
+FROM countries
+-- Join to currencies
+FULL JOIN currencies 
+USING (code)
+-- Where region is North America or name is null
+WHERE  region = 'North America'or name is null 
+ORDER BY region;
+
+Repeat the same query as before, turning your full join into a left join with the currencies table.
+SELECT name AS country, code, region, basic_unit
+FROM countries
+-- Join to currencies
+LEFT JOIN currencies 
+USING (code)
+WHERE region = 'North America' 
+	OR name IS NULL
+ORDER BY region;
+
+Repeat the same query again, this time performing an inner join of countries with currencies.
+SELECT name AS country, code, region, basic_unit
+FROM countries
+-- Join to currencies
+INNER JOIN currencies
+USING (code)
+WHERE region = 'North America' 
+	OR name IS NULL
+ORDER BY region;
+
+Complete the FULL JOIN with countries as c1 on the left and languages as l on the right, using code to perform this join.
+SELECT 
+	c1.name AS country, 
+    region, 
+    l.name AS language,
+	basic_unit, 
+    frac_unit
+FROM countries as c1 
+-- Full join with languages (alias as l)
+FULL JOIN languages as l 
+USING (code)
+-- Full join with currencies (alias as c2)
+FULL JOIN currencies as c2 
+USING (code)
+WHERE region LIKE 'M%esia';
+
+Complete the code to perform an INNER JOIN of countries AS c with languages AS l using the code field to obtain the languages currently spoken in the two countries.
+SELECT c.name AS country, l.name AS language
+-- Inner join countries as c with languages as l on code
+FROM languages as l
+INNER JOIN countries as c
+USING (code)
+WHERE c.code IN ('PAK','IND')
+	AND l.code in ('PAK','IND');
+
+Change your INNER JOIN to a different kind of join to look at possible combinations of languages that could have been spoken in the two countries given their history.
+SELECT c.name AS country, l.name AS language
+FROM countries AS c        
+-- Perform a cross join to languages (alias as l)
+CROSS JOIN languages as l
+WHERE c.code in ('PAK','IND')
+	AND l.code in ('PAK','IND');
+
+
+--You will determine the names of the five countries and their respective regions with the lowest life expectancy for the year 2010. Use your knowledge about joins, filtering, sorting and limiting to create this list!
+SELECT 
+	c.name AS country,
+    region,
+    life_expectancy AS life_exp
+FROM countries AS c
+-- Join to populations (alias as p) using an appropriate join
+LEFT JOIN populations as p
+ON c.code = p.country_code
+-- Filter for only results in the year 2010
+WHERE year = 2010
+-- Sort by life_exp
+ORDER by life_exp 
+-- Limit to five records
+LIMIT 5;
+
+-- Select aliased fields from populations as p1
+SELECT p1.country_code, p1.size AS size2010, p2.size AS size2015
+FROM populations as p1
+-- Join populations as p1 to itself, alias as p2, on country code
+INNER JOIN populations as p2
+ON p1.country_code = p2.country_code;
+
+Since you want to compare records from 2010 and 2015, eliminate unwanted records by extending the WHERE statement to include only records where the p1.year matches p2.year - 5.
+SELECT 
+	p1.country_code, 
+    p1.size AS size2010, 
+    p2.size AS size2015
+FROM populations AS p1
+INNER JOIN populations AS p2
+ON p1.country_code = p2.country_code
+WHERE p1.year = 2010
+-- Filter such that p1.year is always five years before p2.year
+  AND p2.year = 2015
