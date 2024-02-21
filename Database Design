@@ -121,3 +121,31 @@ CREATE TABLE car_model(
 ALTER TABLE rental_cars
 DROP COLUMN model, 
 DROP COLUMN manufacturer;
+
+--Chapter 3
+-- Get all non-systems views
+SELECT * FROM INFORMATION_SCHEMA.views 
+WHERE table_schema NOT IN  ('pg_catalog', 'information_schema');
+
+-- Create a view for reviews with a score above 9
+CREATE VIEW high_scores AS
+SELECT * FROM reviews
+WHERE score > 9;
+
+-- Count the number of self-released works in high_scores
+SELECT COUNT(*) FROM high_scores
+INNER JOIN labels ON high_scores.reviewid = labels.reviewid
+WHERE label = 'self-released';
+
+WHERE label = 'self-released';
+
+
+-- Create a view with the top artists in 2017
+CREATE VIEW top_artists_2017 AS
+-- with only one column holding the artist field
+SELECT artist_title.artist FROM artist_title
+INNER JOIN top_15_2017
+ON artist_title.reviewid = top_15_2017.reviewid;
+
+-- Output the new view
+SELECT * FROM top_artists_2017;
