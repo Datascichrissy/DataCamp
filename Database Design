@@ -67,3 +67,57 @@ WHERE
      dim_genre_sf.genre = 'novel'
 GROUP BY
     dim_state_sf.state;
+
+-- Add a continent_id column with default value of 1
+ALTER TABLE dim_country_sf
+ADD continent_id int NOT NULL DEFAULT(1);
+
+-- Add the foreign key constraint
+ALTER TABLE dim_country_sf ADD CONSTRAINT country_continent
+   FOREIGN KEY (continent_id) REFERENCES dim_continent_sf (continent_id);
+   
+-- Output updated table
+SELECT * FROM dim_country_sf;
+
+-- Create a new table to hold the cars rented by customers
+CREATE TABLE cust_rentals (
+  customer_id INT NOT NULL,
+  car_id VARCHAR(128) NULL,
+  invoice_id VARCHAR(128) NULL
+);
+
+-- Drop a column from customers table to satisfy 1NF
+ALTER TABLE customers
+DROP COLUMN invoice_id,
+DROP COLUMN cars_rented;
+
+
+-- Create a new table to satisfy 2NF
+CREATE TABLE cars (
+  car_id VARCHAR(256) NULL,
+  model VARCHAR(128),
+  manufacturer VARCHAR(128),
+  type_car VARCHAR(128),
+  condition VARCHAR(128),
+  color VARCHAR(128)
+);
+
+-- Drop columns in customer_rentals to satisfy 2NF
+ALTER TABLE customer_rentals
+DROP COLUMN model,
+DROP COLUMN manufacturer, 
+DROP COLUMN type_car,
+DROP COLUMN condition,
+DROP COLUMN color;
+
+-- Create a new table to satisfy 3NF
+CREATE TABLE car_model(
+  model VARCHAR(128),
+  manufacturer VARCHAR(128),
+  type_car VARCHAR(128)
+);
+
+-- Drop columns in rental_cars to satisfy 3NF
+ALTER TABLE rental_cars
+DROP COLUMN model, 
+DROP COLUMN manufacturer;
