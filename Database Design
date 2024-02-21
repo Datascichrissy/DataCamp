@@ -180,3 +180,14 @@ VALUES (50000, 'classical');
 REFRESH MATERIALIZED VIEW genre_count;
 
 SELECT * FROM genre_count;
+
+-Chapter 4
+-- Create a data scientist role
+CREATE ROLE data_scientist;
+
+-- Create a role for Marta
+CREATE ROLE Marta 
+WITH LOGIN;
+
+-- Create an admin role
+CREATE ROLE admin WITH CREATEDB CREATEROLE;
